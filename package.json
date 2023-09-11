@@ -1,0 +1,12 @@
+{
+    "name": "nodejs-project",
+    "version": "1.0.0",
+    "dependencies": {
+        "body-parser": "^1.20.2",
+        "express": "4.17.0",
+        "nodemon": "^3.0.1"
+    },
+    "scripts": {
+        "start": "nodemon index.js"
+    }
+}
