@@ -9,6 +9,8 @@ const app = express();
 // Импорт моделей клссов
 const Good = require("./classes/Good")
 
+const User = require("./classes/Users")
+
 // Получаем плагн bodyParser в переменную
 const bodyParser = require('body-parser');
 
@@ -69,6 +71,50 @@ app.get('/good/del/:id', function(request, response){
     //Задействуем метод, который описан внутри класса
     good.delItem(response, id)
 })
+
+
+/**
+ * Маршрут для получения всех пользователй
+ * Пример: Http://lockalhost:3000/user/get
+ */
+    app.get(   
+        '/user/get',
+        //создаем объект на основе класса Users
+        function(request, response){
+            const user = new User()
+            //передаем в метод ролучения данных о всех пользователяъ
+            //ответ от сервера (response)
+            user.getAll(response)
+        }
+)
+
+/**
+ * Маршрут для получения одного пользователя
+ * Пример: Http://lockalhost:3000/user/get/:id
+ */
+
+app.get('/user/get/:id', function(request, response){
+    //Создаем на основе класса объект
+    const user = new User()
+    const id = request.params.id
+    user.getItem(response, id)
+    //Получить идентификатор из адресной строки
+
+})
+
+/**
+ * Маршрут для удаление одного пользователя
+ * Пример: Http://lockalhost:3000/user/del/:id
+ */
+
+app.get('/user/del/:id', function(request, response){
+    const user = new User()
+    const id = request.params.id
+    user.delItem(response, id)
+
+})
+
+
 
 
 app.post('/getdata', function(request, response){
