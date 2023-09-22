@@ -28,8 +28,14 @@ app.get("/", function(request, response){
         <h1>
             Корневой маршрут
         </h1>
-        <a href='/good/get'>Получение всех товаров: /good/get</a>
-        <a href='/good/get/1'>Получения одного товара: /good/get/[id]</a>
+             <ul>
+                <li>
+                    <a href='/good/get'>Получение всех товаров: /good/get</a>
+                </li>
+                <li>
+                    <a href='/good/get/1'>Получения одного товара: /good/get/[id]</a>
+                </li>
+             </ul>
     `);
 })
 
@@ -113,6 +119,50 @@ app.get('/user/del/:id', function(request, response){
     user.delItem(response, id)
 
 })
+
+/**
+ * Маршрут для добавления одного товара
+ * Пример : http://lockalhost:3000/good/add
+ * type - POST
+ * data : {TITLE ,DISCR, PRICE, IMG, COUNT}
+ */
+
+app.post(
+    '/good/add',
+    function(request, response){
+        console.log(request.body)
+        const good = new Good()
+        good.addItem(response, request.body)
+  
+    }
+)
+
+
+/**
+ * вспомогательный маршрут для добавлениия товара
+ * Форма для добавления товара
+ * Type - GET
+ */
+
+app.get(
+    '/good/form/add',
+    function(request, response){
+        response.send(
+            `
+            <form action='/good/add' method='POST'>
+                <input name='TITLE' placeholder='Название товара' />
+                <input name='DISCR' placeholder='Описание товара' />
+                <input name='PRICE' placeholder='Цена товара' type='number' />
+                <input name='IMG' placeholder='Изобрважение товара' />
+                <input name='COUNT' placeholder='Количество товара' type='number' />
+                <input type='submit' value='Добавить товар'  />
+            </form>
+            `
+        )
+
+    }
+)
+
 
 
 

@@ -1,3 +1,4 @@
+const { response } = require('express');
 const DataBase = require('./DataBase')
 /**
  * Класс для работы с товарами из базы данных

@@ -1,4 +1,5 @@
 const mysql = require("mysql")
+const uid = require('uuid')
 module.exports = class DataBase{
     #config = {
         host: "94.228.126.172",
@@ -57,6 +58,53 @@ module.exports = class DataBase{
                 res.send(result)
                 }
             )
+        }
+
+        addItem(response, data){
+            const id = uid.v4()
+            data['ID'] = id
+            console.log(id)
+            let fiedlsName = '(';
+            let valueFields = '(';
+            let key = 0;
+
+            for(let field in data){
+                fidlsName += field
+                if(Object.keys(data).length - 1 === key){
+                    fidlsName += ')'
+                }else{
+                    fiedlsName += ', '
+                }
+
+                key++
+            }
+            const sql = 
+            `INSERT INTO ${this.#table_name} ${fiedlsName}
+             VALUES
+             ('${id}', '${data.TITLE}', '${data.DISCR}', '${data.PRICE}', '${data.IMG}', '${data.COUNT}')
+             `
+             //const connect = this.getConnect()
+             //connect.query(sql, function(error, result){
+               // if(error){
+                 //   const responseObject = {
+                 //       status: 500,
+                   //     data: error
+                 //   }
+                 //   response.send(
+                  //      JSON.stringify(responseObject)
+                //        )
+             //   }
+               // if(result.affectedRows === 1){
+                 //   const responseObject = {
+                   //     status: 200,
+                   //     data: data
+                  //  }
+                  //  response.send(
+                   //    JSON.stringify(responseObject)
+                   //    )
+    
+              //  }
+            // })
         }
 }
 
