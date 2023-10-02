@@ -139,6 +139,23 @@ app.post(
 
 
 /**
+ * Маршрут для добавления одного пользователя
+ * Пример : http://lockalhost:3000/user/add
+ * type - POST
+ * data : {TITLE ,DISCR, PRICE, IMG, COUNT}
+ */
+
+app.post(
+    '/user/add',
+    function(request, response){
+        console.log(request.body)
+        const user = new User()
+        user.addItem(response, request.body)
+  
+    }
+)
+
+/**
  * вспомогательный маршрут для добавлениия товара
  * Форма для добавления товара
  * Type - GET

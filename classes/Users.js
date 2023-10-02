@@ -1,48 +1,18 @@
-const mysql = require("mysql")
-
-module.exports = class Users {
-    #config = {
-        host: "94.228.126.172",
-        port: 3306,
-        user: "inordic_sch_usr",
-        password: "VANCfzNsov9GDt1M",
-        database: "inordic_school",
-        connectionLimit : 1000,
-        connectTimeout  : 60 * 60 * 1000,
-        acquireTimeout  : 60 * 60 * 1000,
-        timeout         : 60 * 60 * 1000
+const { response } = require('express');
+const DataBase = require('./DataBase')
+/**
+ * Класс для работы с товарами из базы данных
+ * getAll - метод для получения всех товаров
+ */
+module.exports = class Users extends DataBase{
+    #STATUS_TEXT = {
+        '200': 'Пользователь успешно добавлен',
+        '500': 'Пользователь не добавлег , произошла ошибка'
     }
-
-    getAll(res){
-        //создаем соединение с базой
-    const connect = mysql.createPool(this.#config)
-    //отправим запрос к базе данных
-    connect.query(
-        'SELECT * FROM users',
-        function(eroor, result){
-            res.send(
-                result
-            )
-
-        }
-    )
+    constructor(){
+        super();
+        this.setTableName('goods')
     }
+   
 
-    getItem(res, id){
-        const connect = mysql.createPool(this.#config)
-        connect.query(
-            `SELECT * FROM users WHERE ID="${id}"`,
-            function (error, result) {
-                res.send(result)
-            })
-    }
-
-    delItem(res, id){
-        const connect = mysql.createPool(this.#config)
-        connect.query(
-            `DELETE FROM users WHERE ID="${id}"`,
-            function (error, result) {
-                res.send(result)
-            })
-    }
 }

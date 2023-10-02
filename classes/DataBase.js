@@ -13,7 +13,11 @@ module.exports = class DataBase{
         timeout         : 60 * 60 * 1000
     }
     #table_name
+    #status_text
 
+    setStatus(statusText){
+        this.#status_text = statusText
+    }
     setTableName(tableName){
         this.#table_name = tableName
     }
@@ -61,50 +65,59 @@ module.exports = class DataBase{
         }
 
         addItem(response, data){
+            //генерируем случайный ID через uuid
             const id = uid.v4()
             data['ID'] = id
             console.log(id)
-            let fiedlsName = '(';
+            let fieldsName = '(';
             let valueFields = '(';
             let key = 0;
 
             for(let field in data){
-                fidlsName += field
+                fieldsName += field;
+                valueFields += `'${data[field]}'`;
                 if(Object.keys(data).length - 1 === key){
-                    fidlsName += ')'
+                    fieldsName += ')';
+                    valueFields += ')';
                 }else{
-                    fiedlsName += ', '
+                    fieldsName += ', ';
+                    valueFields += ', ';
                 }
 
                 key++
             }
             const sql = 
-            `INSERT INTO ${this.#table_name} ${fiedlsName}
-             VALUES
-             ('${id}', '${data.TITLE}', '${data.DISCR}', '${data.PRICE}', '${data.IMG}', '${data.COUNT}')
+            `INSERT INTO ${this.#table_name} ${fieldsName}
+             VALUES ${valueFields}
              `
-             //const connect = this.getConnect()
-             //connect.query(sql, function(error, result){
-               // if(error){
-                 //   const responseObject = {
-                 //       status: 500,
-                   //     data: error
-                 //   }
-                 //   response.send(
-                  //      JSON.stringify(responseObject)
-                //        )
-             //   }
-               // if(result.affectedRows === 1){
-                 //   const responseObject = {
-                   //     status: 200,
-                   //     data: data
-                  //  }
-                  //  response.send(
-                   //    JSON.stringify(responseObject)
-                   //    )
-    
-              //  }
-            // })
+            this.sendSqlToBase(sql)
+        }
+        sendSqlToBase(){
+            const status = this.#status_text
+            const connect = this.getConnect()
+            connect.query(sql, function(error, result){
+               if(error){
+                   const responseObject = {
+                       status: 500,
+                       statusText: this.#status_text['500'],
+                     data: error
+                  }
+                   response.send(
+                       JSON.stringify(responseObject)
+                       )
+               }
+               if(result.affectedRows === 1){
+                   const responseObject = {
+                       status: 200,
+                       statusText: this.#status_text['200'],
+                       data: data
+                   }
+                  response.send(
+                      JSON.stringify(responseObject)
+                      )
+   
+              }
+        })
         }
 }
 
