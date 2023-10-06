@@ -29,39 +29,26 @@ module.exports = class DataBase{
     }
 
 
-    getAll(res){
+    getAll(response){
         //создаем соединение с базой
     //отправим запрос к базе данных
-    this.getConnect().query(
-            `SELECT * FROM ${this.#table_name}`,
-            function(eroor, result){
-                res.send(
-                    result
-            )
-
+    const sql =  `SELECT * FROM ${this.#table_name}`
+    this.sendSqlToBase(sql, response, 'SELECT')
             }
-        )
+        
+   
+
+
+    getItem(response, id){
+
+        const sql = `SELECT * FROM ${this.#table_name} WHERE ID="${id}"`
+        this.sendSqlToBase(sql, response, 'SELECT')
     }
 
 
-    getItem(res, id){
-
-        this.getConnect().query(
-                `SELECT * FROM ${this.#table_name} WHERE ID="${id}"`,
-                function (error, result) {
-                    res.send(result)
-                }
-            )
-    }
-
-
-    delItem(res, id){
-            this.getConnect().query(
-                `DELETE FROM ${this.#table_name} WHERE ID="${id}"`,
-                function (error, result) {
-                res.send(result)
-                }
-            )
+    delItem(response, id){
+        const sql = `DELETE FROM ${this.#table_name} WHERE ID="${id}"`
+            this.sendSqlToBase(sql, response, 'DELETE')
         }
 
         addItem(response, data){
@@ -90,35 +77,78 @@ module.exports = class DataBase{
             `INSERT INTO ${this.#table_name} ${fieldsName}
              VALUES ${valueFields}
              `
-            this.sendSqlToBase(sql)
+            this.sendSqlToBase(sql, response, 'INSERT')
         }
-        sendSqlToBase(){
-            const status = this.#status_text
+        sendSqlToBase(sql, response, type){
+            const status = this.#status_text[type]
             const connect = this.getConnect()
             connect.query(sql, function(error, result){
+               //console.log('error', error)
+               // console.log('result', result)
                if(error){
                    const responseObject = {
-                       status: 500,
-                       statusText: this.#status_text['500'],
+                        status: 500,
+                       statusText: status['500'],
                      data: error
                   }
                    response.send(
                        JSON.stringify(responseObject)
                        )
                }
-               if(result.affectedRows === 1){
+               console.log(result)
+               if(result){
                    const responseObject = {
                        status: 200,
-                       statusText: this.#status_text['200'],
-                       data: data
+                       statusText: status['200'],
+                       data: result
                    }
+                   console.log(responseObject)
                   response.send(
                       JSON.stringify(responseObject)
                       )
-   
+                    
               }
         })
+
         }
+
+   updateItem(response, data){
+            console.log(data)
+/**
+ * UPDATE users SET 
+ * NAME = '',
+ * SURNAME = '',
+ * IMG = '',
+ * PASSWORD = '',
+ * EMAIL = '',
+ * PHONE = '',
+ * LOGIN = '',
+ * ROLE = ''
+ * WHERE ID = ${}
+ */
+
+    let values = '';
+    let key = 0;
+
+    for(let field in data){
+        if(field !== `ID`){
+
+            values += `${field} = '${data[field]}'`;
+            console.log(Object.keys(data).length - 2 === key)
+            if(Object.keys(data).length - 2 === key){
+                values += '';
+            }else{
+                values += ', ';
+            }
+            key++
+
+        }
+    }
+
+    let sql = `UPDATE ${this.#table_name} SET ${values} WHERE ID = '${data.ID}'`;
+    console.log(sql)
+    this.sendSqlToBase(sql, response, 'UPDATE')
+   }     
 }
 
 

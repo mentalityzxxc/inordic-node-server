@@ -156,6 +156,72 @@ app.post(
 )
 
 /**
+ * Маршрут для обновления пользователя
+ * Пример: http://lockalhost:3000/user/form/update/:id
+ * type - GET
+ */
+app.get(
+    '/user/form/update/:id',
+    function(request, response){
+        const id = request.params.id
+        response.send(
+            `
+            <h1>Редактируем пользователя: ${id}</h1>
+            <form action='/user/update' method='POST'>
+            <input type='hidden' name='ID' value='${id}' />
+                <input name='NAME' placeholder='Имя' />
+                <input name='SURNAME' placeholder='Фамилия' />
+                <input name='IMG' placeholder='Пароль' />
+                <input name='PASSWORD' placeholder='Имя' />
+                <input name='EMAIL' placeholder='Фамилия' />
+                <input name='PHONE' placeholder='Пароль' />
+                <input name='LOGIN' placeholder='Имя' />
+                <input name='ROLE' placeholder='Фамилия' />
+                <input type='submit' value='Обновить пользователя'  />
+            </form>
+            `)
+        }
+            )
+
+
+
+
+
+/**
+ * Маршрут для обновления пользователя
+ * Пример - http://lockalhost:3000/user/update/
+ * type - POST
+ */
+
+app.post(
+    '/user/update',
+    function(request, response){
+        console.log(request.body)
+        const user = new User()
+        user.updateItem(response, request.body)
+  
+    }
+)
+
+/**
+ * Маршрут для обновления товара
+ * Пример - http://lockalhost:3000/good/update/
+ * type - POST
+ */
+
+app.post(
+    '/good/update',
+    function(request, response){
+        console.log(request.body)
+        const good = new Good()
+        good.updateItem(response, request.body)
+  
+    }
+)
+
+
+
+/**
  * вспомогательный маршрут для добавлениия товара
  * Форма для добавления товара
  * Type - GET
@@ -180,6 +246,54 @@ app.get(
     }
 )
 
+app.get(
+    '/user/form/add',
+    function(request, response){
+        response.send(
+            `
+            <form action='/user/add' method='POST'>
+                <input name='NAME' placeholder='Имя' />
+                <input name='SURNAME' placeholder='Фамилия' />
+                <input name='IMG' placeholder='Пароль' />
+                <input name='PASSWORD' placeholder='Имя' />
+                <input name='EMAIL' placeholder='Фамилия' />
+                <input name='PHONE' placeholder='Пароль' />
+                <input name='LOGIN' placeholder='Имя' />
+                <input name='ROLE' placeholder='Фамилия' />
+                <input type='submit' value='Добавить пользователя'  />
+            </form>
+            `
+        )
+
+    }
+)
+
+/**
+ * вспомогательный маршрут для добавлениия товара
+ * Форма для обновления товара
+ * Type - GET   
+ */
+
+app.get(
+    '/good/form/update/:id',
+    function(request, response){
+        const id = request.params.id
+        response.send(
+            ` <h1>Редактируем товара: ${id}</h1>
+            <form action='/good/update' method='POST'>
+            <input type='hidden' name='ID' value='${id}' />
+                <input name='TITLE' placeholder='Название товара' />
+                <input name='DISCR' placeholder='Описание товара' />
+                <input name='PRICE' placeholder='Цена товара' type='number' />
+                <input name='IMG' placeholder='Изобрважение товара' />
+                <input name='COUNT' placeholder='Количество товара' type='number' />
+                <input type='submit' value='Обновить товар'  />
+            </form>
+            `
+        )
+
+    }
+)
 
 
 
