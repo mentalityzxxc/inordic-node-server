@@ -6,11 +6,18 @@ const express = require("express");
 // express, это метод, результат работы которого мы перемещаем в переменную app
 const app = express();  
 
+const fs = require('fs')
+
+const multer = require('multer')
+const uploadFromForm = multer({dest: 'uploads/'})
+const fileFromForm = uploadFromForm.single('INORDICFILE')
+
 // Импорт моделей клссов
 const Good = require("./classes/Good")
 
 const User = require("./classes/Users")
 
+const File= require("./classes/File")
 // Получаем плагн bodyParser в переменную
 const bodyParser = require('body-parser');
 
@@ -108,17 +115,134 @@ app.get('/user/get/:id', function(request, response){
 
 })
 
+
+/**
+ * Маршрут для обновления пользователя
+ * Пример: http://lockalhost:3000/user/form/add
+ * type - GET
+ */
+app.get(
+    '/user/form/add',
+    function(request, response){
+        response.send(
+            `
+            <h1>Добаление пользователя</h1>
+            <form action='/user/add' method='POST'>
+                <input name='NAME' placeholder='Имя' />
+                <input name='SURNAME' placeholder='Фамилия' />
+                <input name='IMG' placeholder='Аватар' />
+                <input name='PASSWORD' placeholder='Пароль' />
+                <input name='EMAIL' placeholder='Почта' />
+                <input name='PHONE' placeholder='Телефон' />
+                <input name='LOGIN' placeholder='Логин' />
+                <input name='ROLE' placeholder='Роль' />
+                <input type='submit' value='Обновить пользователя'  />
+            </form>
+            `)
+        }
+            )
+/**
+ * Маршрут для добавление одного пользователя
+ * Пример: Http://lockalhost:3000/user/add
+ */
+
+            app.get('/user/del/:id',
+            function(request, response){
+                const user = new User()
+                const id = request.params.id
+                user.addItem(response, id)
+        
+        })
+
+
+
 /**
  * Маршрут для удаление одного пользователя
  * Пример: Http://lockalhost:3000/user/del/:id
  */
 
-app.get('/user/del/:id', function(request, response){
-    const user = new User()
-    const id = request.params.id
-    user.delItem(response, id)
+app.get('/user/del/:id',
+    function(request, response){
+        const user = new User()
+        const id = request.params.id
+        user.delItem(response, id)
 
 })
+
+
+/**
+ * Маршрут для удаления файла
+ * Пример - http/lockalhost:3000/file/del/:name
+ * type - GET
+ */
+app.get('/file/del/:name', function(request, response){
+        const fileName =request.params.name
+        fs.unlink(`./uploads/${fileName}` , function(error){
+                
+                const responseObject = {}
+
+            if(error){
+                responseObject.status = 500
+                responseObject.massage = 'файл не удалился'
+                response.send(JSON.stringify(responseObject))
+            }
+                    responseObject.status = 200
+                    responseObject.massage = 'файл удалился'
+                    response.send(JSON.stringify(responseObject))
+        })
+})
+
+/**
+ * Маршрут для удаления файла
+ * Пример - http/lockalhost:3000/file/form/add
+ * type - GET
+ */
+app.get('/file/form/add', 
+    function(request, response){
+            response.send(`
+            <h1>Форма для отвправки файла</h1>
+                <form action='/file/add' method='POST' enctype='multipart/form-data'>
+                    <input type='file' / name='INORDICFILE'>
+                    <input type='submit' />
+                </form>
+        `)
+    })
+
+
+/**
+ * Маршрут для добавления одного товара
+ * Пример : http://lockalhost:3000/file/add
+ * type - POST 
+ **/
+app.post('/file/add',
+     fileFromForm ,
+    function(request, response){
+        console.log(request.file)
+        const filePath = request.file.path
+        const pathToSave = `uploads/${request.file.originalname}`
+        const pathForReadFile = fs.createReadStream(filePath)
+
+        const desc = fs.createWriteStream(pathToSave)
+
+        pathForReadFile.pipe(desc)
+        
+
+        const responseObject = {}
+
+        pathForReadFile.on('error', function(){
+            responseObject.status = 500
+            responseObject.massage = 'файл не записан'
+            response.send(JSON.stringify(responseObject))
+        })
+
+        pathForReadFile.on('end', function(){
+            responseObject.status = 200
+            responseObject.massage = 'файл успешно записан'
+            response.send(JSON.stringify(responseObject))
+        })
+})
+    
+
 
 /**
  * Маршрут для добавления одного товара
@@ -171,12 +295,12 @@ app.get(
             <input type='hidden' name='ID' value='${id}' />
                 <input name='NAME' placeholder='Имя' />
                 <input name='SURNAME' placeholder='Фамилия' />
-                <input name='IMG' placeholder='Пароль' />
-                <input name='PASSWORD' placeholder='Имя' />
-                <input name='EMAIL' placeholder='Фамилия' />
-                <input name='PHONE' placeholder='Пароль' />
-                <input name='LOGIN' placeholder='Имя' />
-                <input name='ROLE' placeholder='Фамилия' />
+                <input name='IMG' placeholder='Аватар' />
+                <input name='PASSWORD' placeholder='Пароль' />
+                <input name='EMAIL' placeholder='Почта' />
+                <input name='PHONE' placeholder='Телефон' />
+                <input name='LOGIN' placeholder='Логин' />
+                <input name='ROLE' placeholder='Роль' />
                 <input type='submit' value='Обновить пользователя'  />
             </form>
             `)
@@ -246,27 +370,6 @@ app.get(
     }
 )
 
-app.get(
-    '/user/form/add',
-    function(request, response){
-        response.send(
-            `
-            <form action='/user/add' method='POST'>
-                <input name='NAME' placeholder='Имя' />
-                <input name='SURNAME' placeholder='Фамилия' />
-                <input name='IMG' placeholder='Пароль' />
-                <input name='PASSWORD' placeholder='Имя' />
-                <input name='EMAIL' placeholder='Фамилия' />
-                <input name='PHONE' placeholder='Пароль' />
-                <input name='LOGIN' placeholder='Имя' />
-                <input name='ROLE' placeholder='Фамилия' />
-                <input type='submit' value='Добавить пользователя'  />
-            </form>
-            `
-        )
-
-    }
-)
 
 /**
  * вспомогательный маршрут для добавлениия товара
